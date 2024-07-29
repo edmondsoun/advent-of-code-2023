@@ -2,7 +2,6 @@
 import { readFileSync } from 'fs';
 
 // part 1:
-
 const file = readFileSync('./day1input.txt', 'utf-8');
 
 function findCalibrationValue(line: string) {
@@ -47,7 +46,6 @@ function sumValues(input: string) {
 
 
 // part 2:
-
 const numberWords = {
   "one": 1,
   "two": 2,

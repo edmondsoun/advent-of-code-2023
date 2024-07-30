@@ -3,14 +3,14 @@ import { readFileSync } from 'fs';
 
 const file = readFileSync('./day2input.txt', 'utf-8');
 
-// PART 1
-
 /** Takes text input, splits on newlines, returns array with each line as an
  * element. */
 function splitLines(input: string) {
   const lines = input.split(/\r?\n/);
   return lines;
 }
+
+// PART 1
 
 /**
  * Helper function to determine if a game is valid.
@@ -21,13 +21,13 @@ function splitLines(input: string) {
 
 function isGameValid(game: string) {
   const blockPulls = game.split(/, |; /);
-  console.log('the block pull', blockPulls)
+  console.log('the block pull', blockPulls);
 
   for (const pull of blockPulls) {
     const quantityAndColor = pull.split(" ");
     const [strQuantity, color] = quantityAndColor;
     const quantity = Number(strQuantity);
-    console.log("game color and quant", color, quantity)
+    console.log("game color and quant", color, quantity);
 
     if (color === "red" && quantity > 12) return false;
     if (color === "green" && quantity > 13) return false;
@@ -61,7 +61,7 @@ function sumPossibleGames(input: string) {
     const [g, id] = gameName.split(" ");
 
     const isValid = isGameValid(blockPulls);
-    console.log("is this game valid?", id, isValid)
+    console.log("is this game valid?", id, isValid);
 
     if (isValid) sum += Number(id);
   }
@@ -69,4 +69,62 @@ function sumPossibleGames(input: string) {
   return sum;
 }
 
-console.log(sumPossibleGames(file));
+
+// console.log(sumPossibleGames(file));
+
+
+
+// PART 2:
+
+
+/** For each game, find the minimum set of cubes that must have been present.
+ * What is the sum of the power of these sets?
+ *
+ * The power of a set of cubes is equal to the numbers of red, green, and blue
+ * cubes multiplied together. */
+
+function sumMinCubeSetPowers(input: string) {
+  const games = splitLines(input);
+  let sum: number = 0;
+
+  for (const game of games) {
+    const [gameName, blockPulls] = game.split(": ");
+
+    const { red, green, blue } = findMinCubes(blockPulls);
+    const power = red * green * blue;
+
+    sum += power;
+  }
+
+  return sum;
+}
+
+
+function findMinCubes(game: string) {
+  const blockPulls = game.split(/, |; /);
+  console.log('the block pull', blockPulls);
+
+  const minCubes = {
+    "red": 0,
+    "green": 0,
+    "blue": 0,
+  };
+
+  for (const pull of blockPulls) {
+    const quantityAndColor = pull.split(" ");
+    const [strQuantity, color] = quantityAndColor;
+    const quantity = Number(strQuantity);
+    console.log("game color and quant", color, quantity);
+
+    if (color === "red" && quantity > minCubes[color]) minCubes[color] = quantity;
+    if (color === "green" && quantity > minCubes[color]) minCubes[color] = quantity;
+    if (color === "blue" && quantity > minCubes[color]) minCubes[color] = quantity;
+
+  }
+  console.log("minCube return:", minCubes)
+
+  return minCubes;
+}
+
+
+console.log(sumMinCubeSetPowers(file));

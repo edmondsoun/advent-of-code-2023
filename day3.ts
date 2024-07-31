@@ -96,7 +96,6 @@ function isValidPartNum(matrix: string[], fullNumStr: string, i: number, j: numb
       const row = coord[0];
       const col = coord[1];
 
-      console.log("row & col:", row, col)
       // guard against OOB lookup errors:
       if (matrix[row] !== undefined) {
 
@@ -113,4 +112,103 @@ function isValidPartNum(matrix: string[], fullNumStr: string, i: number, j: numb
 }
 
 
-console.log(sumEnginePartNumbers(file));
+// console.log(sumEnginePartNumbers(file));
+
+
+// part 2:
+
+/**
+ * The missing part wasn't the only issue - one of the gears in the engine is
+ * wrong. A gear is any * symbol that is adjacent to exactly two part numbers.
+ * Its gear ratio is the result of multiplying those two numbers together. This
+ * time, you need to find the gear ratio of every gear and add them all up so
+ * that the engineer can figure out which gear needs to be replaced.
+ *
+ */
+
+
+// Plan:
+// Traverse matrix
+// When a star is located:
+// lookaround to find two "anchors":
+// if two anchors are on same row, they must be separated by a single non-numeral
+// for each anchor:
+// traverse backward from numeral to find start of part number
+// traverse forward and write complete number
+
+function sumGearRatios(schematic: string) {
+  const partsMatrix = splitLines(schematic);
+  const gear = "*";
+
+  // loop over rows
+  for (let row = 0; row < partsMatrix.length; row++) {
+    // loop within individual rows
+    for (let col = 0; col < partsMatrix[row].length; col++) {
+      const currentChar = partsMatrix[row][col];
+
+      if (currentChar === gear) {
+        const anchors = locateAnchors(partsMatrix, row, col);
+
+      }
+    }
+  }
+
+}
+
+
+
+// Locate points where gears touch adjacent engine part numbers:
+function locateAnchors(matrix: string[], row: number, col: number) {
+
+  const firstAnchor: number[] = [];
+  const secondAnchor: number[] = [];
+
+  const lookaroundCoords = [
+    [row, col - 1], // left
+    [row, col + 1], // right
+    [row - 1, col], // top
+    [row + 1, col], // bottom
+    [row - 1, col - 1], // top-left
+    [row + 1, col - 1], // bottom-left
+    [row - 1, col + 1], // top-right
+    [row + 1, col + 1], // bottom-right
+  ];
+
+  for (const coord of lookaroundCoords) {
+    const aRow: number = coord[0];
+    const aCol: number = coord[1];
+    const isNotNum = isNaN(Number(matrix[aRow][aCol]));
+
+    if (!isNotNum && firstAnchor.length === 0) {
+      firstAnchor.push(aRow, aCol);
+    }
+
+    if (!isNotNum && firstAnchor.length) {
+      const firstAnchorRow = firstAnchor[0];
+      const firstAnchorCol = firstAnchor[1];
+      // check to make sure second anchor is not another numeral in same part
+      // num sequence:
+      if (!(aRow === firstAnchorRow && Math.abs(aCol - firstAnchorCol) <= 1)) {
+        secondAnchor.push(aRow, aCol);
+      }
+    }
+
+  }
+  return [firstAnchor, secondAnchor];
+}
+
+
+const testMatrix = [
+  '467..114..',
+  '...*......',
+  '..35..633.',
+  '......#...',
+  '617*......',
+  '.....+.58.',
+  '..592.....',
+  '......755.',
+  '...$.*....',
+  '.664.598..',
+];
+
+console.log(locateAnchors(testMatrix, 8, 5));

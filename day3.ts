@@ -50,7 +50,7 @@ function sumEnginePartNumbers(schematic: string) {
 }
 
 // Helper function to extract substring of numerals. Takes matrix and starting
-// position, returns string of consecurtive numerals:
+// position, returns string of consecutive numerals:
 function findFullNum(matrix: string[], i: number, j: number) {
 
   let fullNum: string[] = [];
@@ -139,6 +139,7 @@ function isValidPartNum(matrix: string[], fullNumStr: string, i: number, j: numb
 function sumGearRatios(schematic: string) {
   const partsMatrix = splitLines(schematic);
   const gear = "*";
+  const gearRatios: number[] = [];
 
   // loop over rows
   for (let row = 0; row < partsMatrix.length; row++) {
@@ -147,14 +148,21 @@ function sumGearRatios(schematic: string) {
       const currentChar = partsMatrix[row][col];
 
       if (currentChar === gear) {
-        const anchors = locateAnchors(partsMatrix, row, col);
+        const [firstAnchorCoords, secondAnchorCoords] = locateAnchors(partsMatrix, row, col);
+        // check if there are valid anchors, if not, skip this element:
+        if (firstAnchorCoords.length && secondAnchorCoords.length) {
 
+          const firstPartNum = Number(findFullNumFromAnchor(partsMatrix, firstAnchorCoords));
+          const secondPartNum = Number(findFullNumFromAnchor(partsMatrix, secondAnchorCoords));
+
+          console.log('part nums:', firstPartNum, secondPartNum);
+          gearRatios.push(firstPartNum * secondPartNum);
+        }
       }
     }
   }
-
+  return gearRatios.reduce((a, b) => a + b);
 }
-
 
 
 // Locate points where gears touch adjacent engine part numbers:
@@ -194,9 +202,33 @@ function locateAnchors(matrix: string[], row: number, col: number) {
     }
 
   }
+
   return [firstAnchor, secondAnchor];
 }
 
+function findFullNumFromAnchor(partsMatrix: string[], anchorPoint: number[]) {
+  console.log("in findFullNumFromAnchor");
+  const [row, col] = anchorPoint;
+  const fullNumChars: string[] = [];
+  let colStart: number | null = null;
+
+  // traverse backward to find start of number:
+  for (let i = col; !isNaN(Number(partsMatrix[row][i])); i--) {
+    console.log('in backward loop');
+    colStart = i;
+  }
+
+  // ts guard:
+  if (colStart === null) return;
+
+  // traverse forward to write number:
+  for (let i = colStart; !isNaN(Number(partsMatrix[row][i])); i++) {
+    fullNumChars.push(partsMatrix[row][i]);
+  }
+
+  console.log('fullNumChars?', fullNumChars);
+  return fullNumChars.join('');
+}
 
 const testMatrix = [
   '467..114..',
@@ -211,4 +243,7 @@ const testMatrix = [
   '.664.598..',
 ];
 
-console.log(locateAnchors(testMatrix, 8, 5));
+// console.log(locateAnchors(testMatrix, 4, 3));
+// console.log(findFullNumFromAnchor(testMatrix, [9, 5]));
+console.log(sumGearRatios(file));
+

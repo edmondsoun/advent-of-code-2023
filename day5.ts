@@ -31,7 +31,7 @@ const starts = [
   620379445,
   1609835129,
   60050954,
-]
+];
 
 const mappings = [
   [
@@ -359,4 +359,67 @@ function findLowestDestinationNumber(starts: number[], mapCategories: string[][]
   return lowest;
 }
 
-console.log(findLowestDestinationNumber(starts, mappings))
+// console.log(findLowestDestinationNumber(starts, mappings))
+
+
+
+// PART 2
+
+const startsAndRanges = [
+  2906422699,
+  6916147,
+  3075226163,
+  146720986,
+  689152391,
+  244427042,
+  279234546,
+  382175449,
+  1105311711,
+  2036236,
+  3650753915,
+  127044950,
+  3994686181,
+  93904335,
+  1450749684,
+  123906789,
+  2044765513,
+  620379445,
+  1609835129,
+  60050954,
+];
+
+function generateMap(starts: number[]) {
+  const startToRange = new Map();
+
+  for (let i = 0; i < starts.length; i++) {
+    startToRange.set(starts[i], starts[i + 1]);
+    i++;
+  }
+
+  return startToRange;
+}
+
+// console.log(generateMap(startsAndRanges));
+
+function findLowestDestinationNumberFromRanges(starts: number[], mapCategories: string[][]) {
+  const mapppedRanges = generateMap(starts);
+
+  let lowest = Infinity;
+
+  for (const start of mapppedRanges) {
+    const [seedNo, range] = start;
+
+    for (let i = seedNo; i < seedNo + range; i++) {
+      console.log("What is seedNo?", seedNo)
+      console.log("What is i?", i)
+      const final = findFinalDestinationNumber(i, mapCategories);
+
+      if (final < lowest) lowest = final;
+    }
+
+  }
+
+  return lowest;
+}
+
+console.log(findLowestDestinationNumberFromRanges(startsAndRanges, mappings));
